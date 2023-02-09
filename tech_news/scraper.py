@@ -2,6 +2,7 @@ import requests
 from parsel import Selector
 from requests.exceptions import ConnectTimeout, HTTPError, ReadTimeout
 import time
+import re
 
 
 def fetch(url):
@@ -35,9 +36,27 @@ def scrape_next_page_link(html_content):
     return url_next_page
 
 
-# Requisito 4
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
+
+    select = Selector(html_content)
+
+    string_time = select.css("ul > li.meta-reading-time::text").get()
+    number_time = int("".join(re.findall("\d", string_time)))
+
+    summary = select.css(
+        "div.entry-content > p:nth-of-type(1) ::text").getall()
+
+    data = {
+        "url": select.css("head > link[rel='canonical']::attr(href)").get(),
+        "title": select.css("h1.entry-title::text").get().strip(),
+        "timestamp": select.css("li.meta-date::text").get(),
+        "writer": select.css("span.author > a::text").get(),
+        "reading_time": number_time,
+        "summary": "".join(summary).strip(),
+        "category": select.css("span.label::text").get(),
+    }
+
+    return data
 
 
 # Requisito 5
