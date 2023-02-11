@@ -1,8 +1,9 @@
 import requests
-from parsel import Selector
-from requests.exceptions import ConnectTimeout, HTTPError, ReadTimeout
 import time
 import re
+from parsel import Selector
+from tech_news.database import create_news
+from requests.exceptions import ConnectTimeout, HTTPError, ReadTimeout
 
 
 def fetch(url):
@@ -59,6 +60,26 @@ def scrape_news(html_content):
     return data
 
 
-# Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    base_url = 'https://blog.betrybe.com/'
+    # a cada interação no while, este link troca
+
+    url_news = []  # lista de urls de noticias
+
+    while len(url_news) < amount:
+        news_page = fetch(base_url)  # pagina de "noticias"
+        url_news += scrape_updates(news_page)
+        # url_news recebe uma lista de todas as urls desta pagina atual
+        base_url = scrape_next_page_link(news_page)
+        # Recebe como parametro a pagina atual, e pega o link da proxima pagina
+
+    news_list = []
+
+    for url in url_news:
+        if len(news_list) < amount:
+            html_content = fetch(url)
+            news_data = scrape_news(html_content)
+            news_list.append(news_data)
+
+    create_news(news_list)
+    return news_list
