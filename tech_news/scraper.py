@@ -11,10 +11,8 @@ def fetch(url):
     time.sleep(1)
     try:
         res = requests.get(
-            url,
-            headers={"user-agent": "Fake user-agent"},
-            timeout=3
-            )
+            url, headers={"user-agent": "Fake user-agent"}, timeout=3
+        )
         res.raise_for_status()
     except (ConnectTimeout, HTTPError, ReadTimeout):
         return None
@@ -45,7 +43,8 @@ def scrape_news(html_content):
     number_time = int("".join(re.findall("\d", string_time)))
 
     summary = select.css(
-        "div.entry-content > p:nth-of-type(1) ::text").getall()
+        "div.entry-content > p:nth-of-type(1) ::text"
+    ).getall()
 
     data = {
         "url": select.css("head > link[rel='canonical']::attr(href)").get(),
@@ -61,7 +60,7 @@ def scrape_news(html_content):
 
 
 def get_tech_news(amount):
-    base_url = 'https://blog.betrybe.com/'
+    base_url = "https://blog.betrybe.com/"
     # a cada interação no while, este link troca
 
     url_news = []  # lista de urls de noticias
