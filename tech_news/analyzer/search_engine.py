@@ -1,6 +1,22 @@
-# Requisito 7
+from tech_news.database import db
+
+
 def search_by_title(title):
-    """Seu código deve vir aqui"""
+    query = {
+            "title": {
+                "$regex": title,
+                "$options": "i"
+            }
+        }
+    projection = {"title": 1, "url": 1, "_id": 0}
+    news = db.news.find(query, projection)
+
+    result = []
+
+    for new in news:
+        result.append((new["title"], new["url"]))
+
+    return result
 
 
 # Requisito 8
